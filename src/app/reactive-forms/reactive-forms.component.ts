@@ -1,4 +1,5 @@
-import { Component, OnInit, ViewChild } from '@angular/core'
+import { Component, OnInit, ViewChild, TemplateRef } from '@angular/core'
+import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { FormArray, FormBuilder, FormControl, FormGroup } from '@angular/forms'
 import { ContentChange, QuillEditorComponent } from 'ngx-quill'
 import { debounceTime, distinctUntilChanged, retry } from 'rxjs/operators'
@@ -13,6 +14,9 @@ Quill.register('modules/imageResize', ImageResize);
   templateUrl: './reactive-forms.component.html'
 })
 export class ReactiveFormsComponent implements OnInit {
+  fname;
+  lname;
+  modalRef?: BsModalRef;
   hide = false
   form: FormGroup
   contentForm: FormGroup
@@ -31,7 +35,7 @@ export class ReactiveFormsComponent implements OnInit {
   conceptList:any;
   tutorialList:any;
   topicsList:any;
-  constructor(fb: FormBuilder,public http:HttpClient) {    
+  constructor(fb: FormBuilder,public http:HttpClient,private modalService: BsModalService) {    
     this.contentForm = fb.group({
       title:[null],
       tagline:[null],  
@@ -62,6 +66,10 @@ export class ReactiveFormsComponent implements OnInit {
         ['link', 'image', 'video']                         // link and image, video
       ]
     }
+  }
+
+  abc(){
+    console.log("ok");
   }
 
   get topicId(){
@@ -153,5 +161,13 @@ export class ReactiveFormsComponent implements OnInit {
     this.contentForm.get("tagline").reset();
     this.contentForm.get("title").reset();
     this.contentForm.get("_id").reset();
+  }
+
+  openModal(template: TemplateRef<any>) {
+    this.modalRef = this.modalService.show(template);
+  }
+
+  add(x){
+    console.log(x.value)
   }
 }

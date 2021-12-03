@@ -1,6 +1,8 @@
 
 <h4>Complex reactive form123 asdsfd </h4>
 <p><small>Group with an array with a group of controls</small></p>
+<button (click)="openModal(template)">add</button>
+
 <form [formGroup]="contentForm">
     <div class="container mt-5">
       <label for="tech">Technologies:</label>
@@ -10,6 +12,7 @@
           {{technology.title}}
         </option>
       </select>
+      <img src="/assets/plus-circle-fill.svg" (click)="openModal(template)">
       <label for="tut">Tutorials</label>
       <select formControlName="tutorialId" id="tut" (change)="getConcepts()">
         <option [value]="null" disabled>Please select Tutorial</option>
@@ -43,7 +46,7 @@
             <button (click)="editTopic(topic)">Edit</button>
           </td>
         </tr>   
-        <tr *ngIf="topicsList.length===0">
+        <tr *ngIf="topicsList">
           <td>No Topics Add One</td>
         </tr>     
       </tbody>
@@ -62,3 +65,19 @@
 
     </div>
 </form>
+
+<ng-template #template>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">Modal</h4>
+    <button type="button" class="btn-close close pull-right" aria-label="Close" (click)="modalRef?.hide()">
+      <span aria-hidden="true" class="visually-hidden">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form #anyForm="ngForm">
+      <input type="text" name="fname" (ngModel)="fname">
+      <input type="text" name="lname" (ngModel)="lname">
+      <button (click)="add(anyForm)">hh</button>
+    </form>
+  </div>
+</ng-template>
