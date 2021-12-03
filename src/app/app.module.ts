@@ -32,7 +32,7 @@ import { ReactiveFormsComponent } from './reactive-forms/reactive-forms.componen
 import { SanitizeHtmlComponent } from './sanitize-html/sanitize-html.component'
 import { ViewHTMLComponent } from './view-html/view-html.component'
 import { ViewComponent } from './view/view.component'
-
+import {HttpClientModule} from '@angular/common/http'
 @NgModule({
   bootstrap: [AppComponent],
   declarations: [
@@ -61,6 +61,7 @@ import { ViewComponent } from './view/view.component'
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
+    HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
     MatFormFieldModule,

@@ -1,47 +1,64 @@
-<h3 id="reactiveForms">Reactive Forms and patch value</h3>
 
-<button type="button" (click)="hide=!(!!hide)">
-  hide / show
-</button>
-
-<button type="button" (click)="form.enabled ? form.disable() : form.enable()">
-    disable / enable
-</button>
-
-<button type="button" (click)="backgroundColor = backgroundColor ? '' : 'grey'">toggle
-  backgroundColor
-</button>
-
-<pre>{{ form.get('editor').value }}</pre>
-<button type="button" (click)="patchValue()">patchValue</button>
-<button type="button" (click)="setControl()">setControl</button>
-
-<form [formGroup]="form">
-  <quill-editor
-    #editor [style.display]="hide ? 'none' : 'block'"
-    [styles]="{ backgroundColor:backgroundColor }"
-    formControlName="editor">
-  </quill-editor>
-
-  <h4>Material Quill</h4>
-
-  <pre>{{ form.get('matEditor').value }}</pre>
-  <mat-form-field appearance="fill">
-    <mat-quill
-      #matEditor [style.display]="hide ? 'none' : 'block'"
-      [styles]="{ backgroundColor:backgroundColor }"
-      formControlName="matEditor">
-    </mat-quill>
-  </mat-form-field>
-</form>
-
-<h4>Complex reactive form</h4>
+<h4>Complex reactive form123 asdsfd </h4>
 <p><small>Group with an array with a group of controls</small></p>
-<form [formGroup]="complexForm">
-  <ng-container formArrayName="contents">
-    <ng-container *ngFor="let content of formArray().controls; let i=index;" [formGroupName]="i">
-      <quill-editor formControlName="body">
+<form [formGroup]="contentForm">
+    <div class="container mt-5">
+      <label for="tech">Technologies:</label>
+      <select formControlName="technologyId" id="tech" (change)="getTuts()">
+        <option [value]="null" disabled>Please select Technology</option>
+        <option [value]="technology._id" *ngFor="let technology of technologyList">
+          {{technology.title}}
+        </option>
+      </select>
+      <label for="tut">Tutorials</label>
+      <select formControlName="tutorialId" id="tut" (change)="getConcepts()">
+        <option [value]="null" disabled>Please select Tutorial</option>
+        <option [value]="tutorial._id" *ngFor="let tutorial of tutorialList">
+          {{tutorial.title}}
+        </option>
+      </select>
+      <label for="concepts">Concepts</label>
+      <select formControlName="conceptId" id="concepts" (change)="getTopics()">
+        <option [value]="null" disabled>Please select Concept</option>
+        <option [value]="concept._id" *ngFor="let concept of conceptList">
+          {{concept.title}}
+        </option>
+      </select>
+      <button (click)="showForm=true" [disabled]="!conceptId || showForm">Add Topic</button>
+    </div>
+    <table class="table" *ngIf="conceptId && !showForm">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Tagline</th>
+          <th>Options</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let topic of topicsList">
+          <td>{{topic.title}}</td>
+          <td>{{topic.tagline}}</td>
+          <td>
+            <button (click)="deleteTopic(topic._id)">Delete</button>
+            <button (click)="editTopic(topic)">Edit</button>
+          </td>
+        </tr>   
+        <tr *ngIf="topicsList.length===0">
+          <td>No Topics Add One</td>
+        </tr>     
+      </tbody>
+
+    </table>
+    <div *ngIf="showForm">
+      <label>Topic Title</label>
+      <input type="text" formControlName="title">
+      <label>Topic Tagline</label>
+      <input type="text" formControlName="tagline">
+      <quill-editor formControlName="content"	[modules]="modules">
       </quill-editor>
-    </ng-container>
-  </ng-container>
+      <button (click)="saveTopic()" *ngIf="!topicId">Save</button>
+      <button (click)="updateTopic()" *ngIf="topicId">Update</button>
+      <button (click)="showForm=false">Cancel</button>
+
+    </div>
 </form>

@@ -1,8 +1,12 @@
 import { Component, OnInit, ViewChild } from '@angular/core'
 import { FormArray, FormBuilder, FormControl, FormGroup } from '@angular/forms'
 import { ContentChange, QuillEditorComponent } from 'ngx-quill'
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators'
+import { debounceTime, distinctUntilChanged, retry } from 'rxjs/operators'
 import { MatQuill } from '../mat-quill/mat-quill'
+import Quill from 'quill'
+import ImageResize from 'quill-image-resize-module'
+import { HttpClient } from '@angular/common/http'
+Quill.register('modules/imageResize', ImageResize);
 
 @Component({
   selector: 'app-reactive-forms',
@@ -11,8 +15,10 @@ import { MatQuill } from '../mat-quill/mat-quill'
 export class ReactiveFormsComponent implements OnInit {
   hide = false
   form: FormGroup
-  complexForm: FormGroup
+  contentForm: FormGroup
   backgroundColor = ''
+  showForm=false;
+  modules = {};
   @ViewChild('editor', {
     static: true
   }) editor: QuillEditorComponent
@@ -20,58 +26,63 @@ export class ReactiveFormsComponent implements OnInit {
     static: true
   }) matEditor: MatQuill
 
-  constructor(fb: FormBuilder) {
-    this.form = fb.group({
-      editor: ['<ol><li>test</li><li>123</li></ol>'],
-      matEditor: ['<ol><li>test</li><li>123</li></ol>']
+  apiUrl:string="http://localhost:4000/tutorial";
+  technologyList:any;
+  conceptList:any;
+  tutorialList:any;
+  topicsList:any;
+  constructor(fb: FormBuilder,public http:HttpClient) {    
+    this.contentForm = fb.group({
+      title:[null],
+      tagline:[null],  
+      technologyId:[null], 
+      tutorialId:[null],
+      conceptId:[null],
+      content: [null],
+      _id:[null]      
     })
-    this.complexForm = fb.group({
-      contents: new FormArray([
-        fb.group({ body: new FormControl('<ol><li>test</li><li>123</li></ol>') })
-      ])
+    this.modules = {
+      formula: true,
+      imageResize: {},
+      syntax: true,
+      toolbar: [
+        ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+        ['blockquote', 'code-block'],    
+        [{ 'header': 1 }, { 'header': 2 }],               // custom button values
+        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+        [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
+        [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
+        [{ 'direction': 'rtl' }],                         // text direction    
+        [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
+        [{ 'header': [1, 2, 3, 4, 5, 6, false] }],    
+        [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+        [{ 'font': [] }],
+        [{ 'align': [] }],    
+        ['clean'],                                         // remove formatting button    
+        ['link', 'image', 'video']                         // link and image, video
+      ]
+    }
+  }
+
+  get topicId(){
+    return this.contentForm.get("_id").value;
+  }
+  get conceptId(){
+    return this.contentForm.get("conceptId").value;
+  }
+  saveTopic(){
+    console.log(this.contentForm.value)
+    this.http.post("http://localhost:4000/tutorial/addTopic",this.contentForm.value).subscribe((res)=>{
+      console.log("res",res);
+      this.getTopics()
     })
   }
-
-  formArray() {
-    return this.complexForm.get('contents') as FormArray
-  }
-
-  ngOnInit() {
-    this.form
-      .controls
-      .editor
-      .valueChanges.pipe(
-        debounceTime(400),
-        distinctUntilChanged()
-      )
-      .subscribe((data) => {
-        // tslint:disable-next-line:no-console
-        console.log('native fromControl value changes with debounce', data)
-      })
-
-    this.editor
-      .onContentChanged
-      .pipe(
-        debounceTime(400),
-        distinctUntilChanged()
-      )
-      .subscribe((data: ContentChange) => {
-        // tslint:disable-next-line:no-console
-        console.log('view child + directly subscription', data)
-      })
-
-    this.matEditor
-      .onContentChanged
-      .pipe(
-        debounceTime(400),
-        distinctUntilChanged()
-      )
-      .subscribe((data: ContentChange) => {
-        // tslint:disable-next-line:no-console
-        console.log('view child + directly subscription', data)
+  ngOnInit() {    
+      this.http.get(`${this.apiUrl}/technologiesList`).subscribe((res)=>{
+        console.log("Techs::",res);
+        this.technologyList=res;
       })
   }
-
   setControl() {
     this.form.setControl('editor', new FormControl('test - new Control'))
     this.form.setControl('matEditor', new FormControl('test - new Control'))
@@ -82,4 +93,65 @@ export class ReactiveFormsComponent implements OnInit {
     this.form.get('matEditor').patchValue(`${this.form.get('matEditor').value} patched!`)
   }
 
+  getTuts(){
+    this.http
+    .get(`${this.apiUrl}/tutorialListByTechnologyId?technologyId=${this.contentForm.get('technologyId')?.value}`)
+    .subscribe((res)=>{
+      console.log("tuts::",res);
+      this.tutorialList=res;
+      this.contentForm.get("tutorialId").setValue(null)
+      this.conceptList=null;
+      this.contentForm.get("conceptId").setValue(null)
+      this.topicsList=null;
+      this.resetTopicForm();
+    })
+  }
+  getConcepts(){
+    console.log("HE concepts")
+    this.conceptList=null;
+    this.contentForm.get("conceptId").setValue(null);
+    this.resetTopicForm();
+    this.http
+    .get(`${this.apiUrl}/conceptListByTutorialId?tutorialId=${this.contentForm.get('tutorialId')?.value}`)
+    .subscribe((res)=>{
+      console.log("concepts::",res);
+      this.conceptList=res;
+    })
+  }
+  getTopics(){
+    console.log("HE topics")
+    this.resetTopicForm();
+    this.http
+    .get(`${this.apiUrl}/topicsByConceptId/${this.contentForm.get('conceptId')?.value}`)
+    .subscribe((res)=>{
+      console.log("topics::",res);
+      this.topicsList=res;
+    })
+  }
+  deleteTopic(topicId){
+    console.log("delete topic");
+    this.http
+    .delete(`${this.apiUrl}/deleteTopicById/${topicId}`)
+    .subscribe((res)=>{
+      this.getTopics();
+    })
+  }
+  editTopic(topic){
+    console.log("topic::",topic)
+    this.contentForm.patchValue(topic);
+    this.showForm=true;
+  }
+  updateTopic(){
+    this.http
+    .put(`${this.apiUrl}/updateTopicByTopicId`,this.contentForm.value)
+    .subscribe((res)=>{
+      this.getTopics();
+    })    
+  }
+  resetTopicForm(){
+    this.contentForm.get("content").reset();
+    this.contentForm.get("tagline").reset();
+    this.contentForm.get("title").reset();
+    this.contentForm.get("_id").reset();
+  }
 }
