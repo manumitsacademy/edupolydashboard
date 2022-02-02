@@ -1,58 +1,69 @@
-
-<h4>Complex reactive form123 asdsfd </h4>
-<p><small>Group with an array with a group of controls</small></p>
+<h1 class="main-heading">Edupoly Dashboard</h1>
 <form [formGroup]="contentForm">
-    <div class="container mt-5">
-      <label for="tech">Technologies:</label>
-      <select formControlName="technologyId" id="tech" (change)="getTuts()">
-        <option [value]="null" disabled>Please select Technology</option>
-        <option [value]="technology._id" *ngFor="let technology of technologyList">
-          {{technology.title}}
-        </option>
-      </select>
-      <label for="tut">Tutorials</label>
-      <select formControlName="tutorialId" id="tut" (change)="getConcepts()">
-        <option [value]="null" disabled>Please select Tutorial</option>
-        <option [value]="tutorial._id" *ngFor="let tutorial of tutorialList">
-          {{tutorial.title}}
-        </option>
-      </select>
-      <label for="concepts">Concepts</label>
-      <select formControlName="conceptId" id="concepts" (change)="getTopics()">
-        <option [value]="null" disabled>Please select Concept</option>
-        <option [value]="concept._id" *ngFor="let concept of conceptList">
-          {{concept.title}}
-        </option>
-      </select>
-      <button (click)="showForm=true" [disabled]="!conceptId || showForm">Add Topic</button>
+    <div class="container editForm mt-5">
+      <div>
+        <label for="tech">Technologies:</label>
+        <select formControlName="technologyId" id="tech" (change)="getTuts()">
+          <option [value]="null" disabled>Please select Technology</option>
+          <option [value]="technology._id" *ngFor="let technology of technologyList">
+            {{technology.title}}
+          </option>
+        </select>
+        <img src="/assets/plus-circle-fill.svg" (click)="openModal(addTech)">
+      </div>
+      <div>
+        <label for="tut">Tutorials:</label>
+        <select formControlName="tutorialId" id="tut" (change)="getConcepts()">
+          <option [value]="null" disabled>Please select Tutorial</option>
+          <option [value]="tutorial._id" *ngFor="let tutorial of tutorialList">
+            {{tutorial.title}}
+          </option>
+        </select>
+        <img src="/assets/plus-circle-fill.svg" (click)="openModal(addTut)" *ngIf="currentTechnology">
+      </div>
+      <div>
+        <label for="concepts">Concepts:</label>
+        <select formControlName="conceptId" id="concepts" (change)="getTopics()">
+          <option [value]="null" disabled>Please select Concept</option>
+          <option [value]="concept._id" *ngFor="let concept of conceptList">
+            {{concept.title}}
+          </option>
+        </select>
+        <img src="/assets/plus-circle-fill.svg" (click)="openModal(addConcpt)" *ngIf="currentTutorial">
+      </div>
+      <div>
+        <button class="addBtn btn btn-primary" (click)="showForm=true" [disabled]="!conceptId || showForm">Add Topic</button>
+      </div>
     </div>
-    <table class="table" *ngIf="conceptId && !showForm">
-      <thead>
-        <tr>
-          <th>Title</th>
-          <th>Tagline</th>
-          <th>Options</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let topic of topicsList">
-          <td>{{topic.title}}</td>
-          <td>{{topic.tagline}}</td>
-          <td>
-            <button (click)="deleteTopic(topic._id)">Delete</button>
-            <button (click)="editTopic(topic)">Edit</button>
-          </td>
-        </tr>   
-        <tr *ngIf="topicsList.length===0">
-          <td>No Topics Add One</td>
-        </tr>     
-      </tbody>
+    <div class="container">
+      <table class="table" *ngIf="conceptId && !showForm">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Tagline</th>
+            <th>Options</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let topic of topicsList">
+            <td>{{topic.title}}</td>
+            <td>{{topic.tagline}}</td>
+            <td>
+              <button class="delBtn btn btn-danger" (click)="deleteTopic(topic._id)">Delete</button>
+              <button class="btn btn-warning" (click)="editTopic(topic)">Edit</button>
+            </td>
+          </tr>   
+          <tr *ngIf="!topicsList.length">
+            <td colspan="3" class="w-100 text-center">No Topics Add One</td>
+          </tr>     
+        </tbody>
 
-    </table>
-    <div *ngIf="showForm">
-      <label>Topic Title</label>
+      </table>
+    </div>
+    <div *ngIf="showForm" class="container">
+      <label>Topic Title:</label>
       <input type="text" formControlName="title">
-      <label>Topic Tagline</label>
+      <label>Topic Tagline:</label>
       <input type="text" formControlName="tagline">
       <quill-editor formControlName="content"	[modules]="modules">
       </quill-editor>
@@ -62,3 +73,85 @@
 
     </div>
 </form>
+
+<ng-template #addTech>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">Add Technology</h4>
+    <button type="button" class="btn-close close pull-right" aria-label="Close" (click)="modalRef?.hide()">
+      <span aria-hidden="true" class="visually-hidden">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form #addTechnologyForm="ngForm">
+      <div>
+        <label for="techTitle">Technology Title: </label>
+        <input type="text" id="techTitle" name="title" [(ngModel)]="technologyTitle">
+      </div>
+      <div>
+        <label for="techTagline">Technology Tagline: </label>
+        <input type="text" id="techtagline" name="tagline" [(ngModel)]="technologyTagline">
+      </div>
+      <button (click)="addTechnology(addTechnologyForm)">Add</button>
+    </form>
+  </div>
+</ng-template>
+
+<ng-template #addTut>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">Add Tutorial</h4>
+    <button type="button" class="btn-close close pull-right" aria-label="Close" (click)="modalRef?.hide()">
+      <span aria-hidden="true" class="visually-hidden">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div>
+      <label for="techName">Technology:</label>
+      <input type="text" id="techName" name="techName" [(ngModel)]="techName" disabled>
+    </div>
+    <form #addTutorialForm="ngForm">
+      <div *ngIf="">
+        <label for="techId">Technology ID: </label>
+        <input type="text" id="techId" name="technologyId" [(ngModel)]="techId">
+      </div>
+      <div>
+        <label for="tutTitle">Tutorial Title: </label>
+        <input type="text" id="tutTitle" name="title" [(ngModel)]="tutorialTitle">
+      </div>
+      <div>
+        <label for="tutTagline">Tutorial Tagline: </label>
+        <input type="text" id="tutTagline" name="tagline" [(ngModel)]="tutorialTagline">
+      </div>
+      <button (click)="addTutorial(addTutorialForm)">Add</button>
+    </form>
+  </div>
+</ng-template>
+
+<ng-template #addConcpt>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">Add Concept</h4>
+    <button type="button" class="btn-close close pull-right" aria-label="Close" (click)="modalRef?.hide()">
+      <span aria-hidden="true" class="visually-hidden">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div>
+      <label for="tutName">Tutorial:</label>
+      <input type="text" id="tutName" name="tutName" [(ngModel)]="tutorialName" disabled>
+    </div>
+    <form #addConceptForm="ngForm">
+      <div *ngIf="">
+        <label for="tutId">Tutorial ID: </label>
+        <input type="text" id="tutId" name="tutorialId" [(ngModel)]="tutId">
+      </div>
+      <div>
+        <label for="conceptTitle">Concept Title: </label>
+        <input type="text" id="conceptTitle" name="title" [(ngModel)]="conceptTitle">
+      </div>
+      <div>
+        <label for="conceptTagline">Concept Tagline: </label>
+        <input type="text" id="conceptTagline" name="tagline" [(ngModel)]="conceptTagline">
+      </div>
+      <button (click)="addConcept(addConceptForm)">Add</button>
+    </form>
+  </div>
+</ng-template>

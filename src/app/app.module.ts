@@ -1,7 +1,7 @@
 import { NgModule, NO_ERRORS_SCHEMA } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { BrowserModule } from '@angular/platform-browser'
-
+import { ModalModule } from 'ngx-bootstrap/modal';
 import { QuillModule } from 'ngx-quill'
 import { ChildModule } from './child-module/child-module'
 
@@ -65,6 +65,7 @@ import {HttpClientModule} from '@angular/common/http'
     FormsModule,
     ReactiveFormsModule,
     MatFormFieldModule,
+    ModalModule.forRoot(),
     QuillModule.forRoot({
       customModules: [{
         implementation: Counter,
