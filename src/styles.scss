@@ -3,6 +3,7 @@
  * QUILL - SAMPLE OVERRIDES
  */
 
+
 quill-editor {
   display: block;
 }
@@ -77,6 +78,41 @@ app-root > div > * > ng-form {
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+app-reactive-forms { 
+  .main-heading{
+    text-align:center;
+  }
+  .container.editForm{
+    min-width:fit-content;
+    border: 1px solid;
+    border-radius: 5px;
+    background-color: lightblue;
+    padding: 30px;
+    display: flex;
+    justify-content: space-around;
+    & div{
+      display: flex;
+      align-items:center;
+    }
+    label{
+      margin: 0 10px 0 0;
+    }
+
+    img{
+      margin: 0 30px 0 10px;
+      cursor: pointer;
+    }
+    .addBtn{
+      min-width: 100px;
+    }
+  }
+  table{
+    .delBtn{
+      margin-right: 10px;
+    }
+  }
 }
 
 app-root > div > * {
