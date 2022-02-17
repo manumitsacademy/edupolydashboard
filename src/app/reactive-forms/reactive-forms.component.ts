@@ -1,13 +1,13 @@
 import { Component, OnInit, ViewChild, TemplateRef } from '@angular/core'
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
-import { FormArray, FormBuilder, FormControl, FormGroup } from '@angular/forms'
-import { ContentChange, QuillEditorComponent } from 'ngx-quill'
-import { debounceTime, distinctUntilChanged, retry } from 'rxjs/operators'
+import {  FormBuilder, FormControl, FormGroup } from '@angular/forms'
+import { QuillEditorComponent } from 'ngx-quill'
 import { MatQuill } from '../mat-quill/mat-quill'
 import Quill from 'quill'
 import ImageResize from 'quill-image-resize-module';
 import { HttpClient } from '@angular/common/http';
 Quill.register('modules/imageResize', ImageResize);
+import { CoursesService } from '../services/courses.service';
 
 @Component({
   selector: 'app-reactive-forms',
@@ -39,7 +39,7 @@ export class ReactiveFormsComponent implements OnInit {
   conceptList:any;
   tutorialList:any;
   topicsList:any;
-  constructor(fb: FormBuilder,public http:HttpClient,private modalService: BsModalService) {    
+  constructor(fb: FormBuilder,public http:HttpClient,private modalService: BsModalService, public coursesService:CoursesService) {    
     this.contentForm = fb.group({
       title:[null],
       tagline:[null],  
@@ -48,7 +48,7 @@ export class ReactiveFormsComponent implements OnInit {
       conceptId:[null],
       content: [null],
       _id:[null]      
-    })
+    });
     this.modules = {
       formula: true,
       imageResize: {},
@@ -69,7 +69,7 @@ export class ReactiveFormsComponent implements OnInit {
         ['clean'],                                         // remove formatting button    
         ['link', 'image', 'video']                         // link and image, video
       ]
-    }
+    };
   }
 
   get topicId(){
@@ -79,21 +79,18 @@ export class ReactiveFormsComponent implements OnInit {
     return this.contentForm.get("conceptId").value;
   }
   saveTopic(){
-    //console.log(this.contentForm.value)
-    this.http.post("http://localhost:4000/tutorial/addTopic",this.contentForm.value).subscribe((res)=>{
-      //console.log("res",res);
-      this.getTopics()
-    })
+    this.coursesService.addTopic(this.contentForm.value).subscribe((res)=>{
+      this.getTopics();
+    });
   }
   ngOnInit() {    
-      this.getAlltechnologies();
+    this.getAlltechnologies();
   }
 
   getAlltechnologies(){
-    this.http.get(`${this.apiUrl}/technologiesList`).subscribe((res)=>{
-      //console.log("Techs::",res);
+    this.coursesService.getAlltechnologies().subscribe((res)=>{
       this.technologyList=res;
-    })
+    });
   }
 
   setControl() {
@@ -112,19 +109,15 @@ export class ReactiveFormsComponent implements OnInit {
     });
     this.techName = this.currentTechnology.title;
     this.showForm = false;
-    //console.log(this.contentForm.value);
     this.techId = this.contentForm.get('technologyId')?.value;
-    this.http
-    .get(`${this.apiUrl}/tutorialListByTechnologyId?technologyId=${this.techId}`)
-    .subscribe((res)=>{
-      //console.log("tuts::",res);
+    this.coursesService.getTutorialListByTechnologyId(this.techId).subscribe((res)=>{
       this.tutorialList=res;
       this.contentForm.get("tutorialId").setValue(null)
       this.conceptList=null;
       this.contentForm.get("conceptId").setValue(null)
       this.topicsList=[];
       this.resetTopicForm();
-    })
+    });    
   }
   getConcepts(){
     this.currentTutorial = this.tutorialList.find((tutorial)=>{
@@ -133,46 +126,31 @@ export class ReactiveFormsComponent implements OnInit {
     this.tutorialName = this.currentTutorial.title;
     this.showForm = false;
     this.tutId = this.contentForm.get('tutorialId')?.value
-    //console.log("HE concepts")
     this.conceptList=null;
     this.contentForm.get("conceptId").setValue(null);
     this.resetTopicForm();
-    this.http
-    .get(`${this.apiUrl}/conceptListByTutorialId?tutorialId=${this.tutId}`)
-    .subscribe((res)=>{
-      //console.log("concepts::",res);
+    this.coursesService.getConceptListByTutorialId(this.tutId).subscribe((res)=>{
       this.conceptList=res;
-    })
+    });
   }
   getTopics(){
     this.showForm = false;
-    //console.log("HE topics")
     this.resetTopicForm();
-    this.http
-    .get(`${this.apiUrl}/topicsByConceptId/${this.contentForm.get('conceptId')?.value}`)
-    .subscribe((res)=>{
-      //console.log("topics::",res);
+    this.coursesService.getTopicsByConceptId(this.conceptId).subscribe((res)=>{
       this.topicsList=res;
-      //console.log(this.topicsList);
-    })
+    });
   }
   deleteTopic(topicId){
-    //console.log("delete topic");
-    this.http
-    .delete(`${this.apiUrl}/deleteTopicById/${topicId}`)
-    .subscribe((res)=>{
+    this.coursesService.deleteTopic(topicId,this.conceptId).subscribe((res)=>{
       this.getTopics();
     })
   }
   editTopic(topic){
-    //console.log("topic::",topic)
     this.contentForm.patchValue(topic);
     this.showForm=true;
   }
   updateTopic(){
-    this.http
-    .put(`${this.apiUrl}/updateTopicByTopicId`,this.contentForm.value)
-    .subscribe((res)=>{
+    this.coursesService.updateTopic(this.contentForm.value).subscribe((res)=>{
       this.getTopics();
     })    
   }
@@ -183,22 +161,23 @@ export class ReactiveFormsComponent implements OnInit {
     this.contentForm.get("_id").reset();
   }
 
+  /* openAddTechModal(){
+    this.modalRef = this.modalService.show(AddTechnologyModalComponent);
+  } */
+
   openModal(template: TemplateRef<any>) {
     this.modalRef = this.modalService.show(template);
   }
 
   addTechnology(techForm){
     this.http.post('http://localhost:4000/tutorial/addTechnology',techForm.value).subscribe((res)=>{
-      //console.log(res);
       this.getAlltechnologies();
     });
-    
     this.modalRef.hide();
   }
 
   addTutorial(tutForm){
     this.http.post('http://localhost:4000/tutorial/addTutorial',tutForm.value).subscribe((res)=>{
-      //console.log(res);
       this.getTuts();
     });    
     this.modalRef.hide();
@@ -206,7 +185,6 @@ export class ReactiveFormsComponent implements OnInit {
 
   addConcept(conceptForm){
     this.http.post('http://localhost:4000/tutorial/addConcept',conceptForm.value).subscribe((res)=>{
-      //console.log(res);
       this.getConcepts();
     });    
     this.modalRef.hide();

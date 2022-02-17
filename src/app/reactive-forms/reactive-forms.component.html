@@ -109,17 +109,17 @@
       <input type="text" id="techName" name="techName" [(ngModel)]="techName" disabled>
     </div>
     <form #addTutorialForm="ngForm">
-      <div *ngIf="">
+      <div>
         <label for="techId">Technology ID: </label>
-        <input type="text" id="techId" name="technologyId" [(ngModel)]="techId">
+        <input type="text" id="techId" name="technologyId" #technoid="ngModel" [ngModel]="techId">
       </div>
       <div>
         <label for="tutTitle">Tutorial Title: </label>
-        <input type="text" id="tutTitle" name="title" [(ngModel)]="tutorialTitle">
+        <input type="text" id="tutTitle" name="title" #tuttitle="ngModel" [ngModel]>
       </div>
       <div>
         <label for="tutTagline">Tutorial Tagline: </label>
-        <input type="text" id="tutTagline" name="tagline" [(ngModel)]="tutorialTagline">
+        <input type="text" id="tutTagline" name="tagline" #tutTagline="ngModel" [ngModel]>
       </div>
       <button (click)="addTutorial(addTutorialForm)">Add</button>
     </form>
@@ -139,17 +139,17 @@
       <input type="text" id="tutName" name="tutName" [(ngModel)]="tutorialName" disabled>
     </div>
     <form #addConceptForm="ngForm">
-      <div *ngIf="">
+      <div>
         <label for="tutId">Tutorial ID: </label>
-        <input type="text" id="tutId" name="tutorialId" [(ngModel)]="tutId">
+        <input type="text" id="tutId" name="tutorialId" #tutorialid="ngModel" [ngModel]="tutId">
       </div>
       <div>
         <label for="conceptTitle">Concept Title: </label>
-        <input type="text" id="conceptTitle" name="title" [(ngModel)]="conceptTitle">
+        <input type="text" id="conceptTitle" name="title" #concepttitle="ngModel" [ngModel]="conceptTitle">
       </div>
       <div>
         <label for="conceptTagline">Concept Tagline: </label>
-        <input type="text" id="conceptTagline" name="tagline" [(ngModel)]="conceptTagline">
+        <input type="text" id="conceptTagline" name="tagline" #concepttagline="ngModel" [ngModel]="conceptTagline">
       </div>
       <button (click)="addConcept(addConceptForm)">Add</button>
     </form>
