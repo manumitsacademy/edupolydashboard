@@ -32,7 +32,10 @@ import { ReactiveFormsComponent } from './reactive-forms/reactive-forms.componen
 import { SanitizeHtmlComponent } from './sanitize-html/sanitize-html.component'
 import { ViewHTMLComponent } from './view-html/view-html.component'
 import { ViewComponent } from './view/view.component'
-import {HttpClientModule} from '@angular/common/http'
+import {HttpClientModule} from '@angular/common/http';
+import { AddTechnologyModalComponent } from './modals/add-technology-modal/add-technology-modal.component';
+import { AddTutorialModalComponent } from './modals/add-tutorial-modal/add-tutorial-modal.component';
+import { AddConceptModalComponent } from './modals/add-concept-modal/add-concept-modal.component'
 @NgModule({
   bootstrap: [AppComponent],
   declarations: [
@@ -56,7 +59,10 @@ import {HttpClientModule} from '@angular/common/http'
     QuillApiEmbedComponent,
     ViewComponent,
     ViewHTMLComponent,
-    ModelValidation
+    ModelValidation,
+    AddTechnologyModalComponent,
+    AddTutorialModalComponent,
+    AddConceptModalComponent
   ],
   imports: [
     BrowserModule,
