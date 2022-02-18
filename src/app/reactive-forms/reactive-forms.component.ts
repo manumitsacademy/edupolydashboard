@@ -161,32 +161,29 @@ export class ReactiveFormsComponent implements OnInit {
     this.contentForm.get("_id").reset();
   }
 
-  /* openAddTechModal(){
-    this.modalRef = this.modalService.show(AddTechnologyModalComponent);
-  } */
 
   openModal(template: TemplateRef<any>) {
     this.modalRef = this.modalService.show(template);
   }
 
   addTechnology(techForm){
-    this.http.post('http://localhost:4000/tutorial/addTechnology',techForm.value).subscribe((res)=>{
+    this.coursesService.addTechnology(techForm.value).subscribe((res)=>{
       this.getAlltechnologies();
     });
     this.modalRef.hide();
   }
 
   addTutorial(tutForm){
-    this.http.post('http://localhost:4000/tutorial/addTutorial',tutForm.value).subscribe((res)=>{
+    this.coursesService.addTutorial(tutForm.value).subscribe((res)=>{
       this.getTuts();
-    });    
+    });
     this.modalRef.hide();
   }
 
   addConcept(conceptForm){
-    this.http.post('http://localhost:4000/tutorial/addConcept',conceptForm.value).subscribe((res)=>{
+    this.coursesService.addConcept(conceptForm.value).subscribe((res)=>{
       this.getConcepts();
-    });    
+    })    
     this.modalRef.hide();
   }
 }

@@ -29,8 +29,16 @@ export class CoursesService {
     return this.http.post(`${this.apiUrl}/addTechnology`,formContent);
   }
 
+  addTutorial(formContent:any){
+    return this.http.post(`${this.apiUrl}/addTutorial`,formContent);
+  }
+
+  addConcept(formContent:any){
+    return this.http.post(`${this.apiUrl}/addConcept`,formContent);
+  }
+
   addTopic(formContent:any){
-    return this.http.post("http://localhost:4000/tutorial/addTopic",formContent);
+    return this.http.post(`${this.apiUrl}/addTopic`,formContent);
   }
 
   deleteTopic(topicId:any,conceptId:any){
