@@ -5,7 +5,7 @@ import { HttpClient } from '@angular/common/http';
   providedIn: 'root'
 })
 export class CoursesService {
-  apiUrl:string="https://limitless-island-65292.herokuapp.com/tutorial";
+  apiUrl:string="https://us-central1-edupoly-backend-9d585.cloudfunctions.net/app/tutorial";
   technologyList:any;
   constructor(private http:HttpClient) { }
 
